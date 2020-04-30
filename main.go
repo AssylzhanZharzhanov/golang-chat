@@ -8,10 +8,12 @@ import (
 )
 
 func main() {
+	log.Println("Server started...")
 	r := mux.NewRouter()
 	room := newRoom()
+	go room.run()
 
-	r.HandleFunc("/room", func(w http.ResponseWriter, r *http.Request) {
+	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWs(room, w, r)
 	})
 

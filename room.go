@@ -1,5 +1,6 @@
 package main
 
+// Room maintains the set of active clients and broadcasts messages to the clients
 type Room struct {
 	broadcast chan []byte
 	join      chan *Client
@@ -28,7 +29,12 @@ func (r *Room) run() {
 			}
 		case msg := <-r.broadcast:
 			for client := range r.clients {
-				client.send <- msg
+				select {
+				case client.send <- msg:
+				default:
+					close(client.send)
+					delete(r.clients, client)
+				}
 			}
 		}
 	}
